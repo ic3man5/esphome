@@ -7,6 +7,8 @@ from esphome.const import CONF_ID, CONF_TIME_ID
 DEPENDENCIES = ['uart']
 
 CONF_IGNORE_MCU_UPDATE_ON_DATAPOINTS = "ignore_mcu_update_on_datapoints"
+CONF_SERIAL_BYTE_DELAY_US = "serial_byte_delay_us"
+CONF_SERIAL_COMMAND_DELAY_MS = "serial_command_delay_ms"
 
 tuya_ns = cg.esphome_ns.namespace('tuya')
 Tuya = tuya_ns.class_('Tuya', cg.Component, uart.UARTDevice)
@@ -16,6 +18,8 @@ CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(Tuya),
     cv.Optional(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
     cv.Optional(CONF_IGNORE_MCU_UPDATE_ON_DATAPOINTS): cv.ensure_list(cv.uint8_t),
+    cv.Optional(CONF_SERIAL_BYTE_DELAY_US, default=0): cv.int_range(min=0, max=10000),
+    cv.Optional(CONF_SERIAL_COMMAND_DELAY_MS, default=0): cv.int_range(min=0, max=1000),
 }).extend(cv.COMPONENT_SCHEMA).extend(uart.UART_DEVICE_SCHEMA)
 
 

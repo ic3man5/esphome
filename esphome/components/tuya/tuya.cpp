@@ -324,14 +324,22 @@ void Tuya::send_command_(TuyaCommandType command, const uint8_t *buffer, uint16_
   ESP_LOGV(TAG, "Sending Tuya: CMD=0x%02X VERSION=%u DATA=[%s] INIT_STATE=%u", command, version,  // NOLINT
            hexencode(buffer, len).c_str(), this->init_state_);
 
-  this->write_array({0x55, 0xAA, version, (uint8_t) command, len_hi, len_lo});
-  if (len != 0)
-    this->write_array(buffer, len);
-
+  // Write the command
+  for (auto &data_byte : {0x55, 0xAA, version, (uint8_t) command, len_hi, len_lo}) {
+      this->write_byte(data_byte);
+      delayMicroseconds(this->serial_byte_delay_us_);
+  }
+  // Write the buffer, if we have one
+  for (uint16_t i=0; i < len; ++i) {
+      this->write_byte(buffer[i]);
+      delayMicroseconds(this->serial_byte_delay_us_);
+  }
   uint8_t checksum = 0x55 + 0xAA + (uint8_t) command + len_hi + len_lo;
   for (int i = 0; i < len; i++)
     checksum += buffer[i];
   this->write_byte(checksum);
+  delayMicroseconds(this->serial_byte_delay_us_);
+  delayMicroseconds(this->serial_command_delay_ms_*1000);
 }
 
 void Tuya::set_datapoint_value(TuyaDatapoint datapoint) {

@@ -97,6 +97,8 @@ class Tuya : public Component, public uart::UARTDevice {
   std::vector<TuyaDatapoint> datapoints_;
   std::vector<uint8_t> rx_message_;
   std::vector<uint8_t> ignore_mcu_update_on_datapoints_{};
+  uint32_t serial_byte_delay_us_;
+  uint32_t serial_command_delay_ms_;
 };
 
 }  // namespace tuya
