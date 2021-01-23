@@ -74,6 +74,12 @@ class Tuya : public Component, public uart::UARTDevice {
   void add_ignore_mcu_update_on_datapoints(uint8_t ignore_mcu_update_on_datapoints) {
     this->ignore_mcu_update_on_datapoints_.push_back(ignore_mcu_update_on_datapoints);
   }
+  void set_serial_byte_delay_us(uint32_t serial_byte_delay_us) {
+    this->serial_byte_delay_us_ = serial_byte_delay_us;
+  }
+  void set_command_byte_delay_ms(uint32_t serial_command_delay_us) {
+    this->serial_command_delay_us_ = serial_command_delay_us;
+  }
 
  protected:
   void handle_char_(uint8_t c);
@@ -98,7 +104,7 @@ class Tuya : public Component, public uart::UARTDevice {
   std::vector<uint8_t> rx_message_;
   std::vector<uint8_t> ignore_mcu_update_on_datapoints_{};
   uint32_t serial_byte_delay_us_;
-  uint32_t serial_command_delay_ms_;
+  uint32_t serial_command_delay_us_;
 };
 
 }  // namespace tuya

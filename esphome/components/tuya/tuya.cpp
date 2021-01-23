@@ -31,6 +31,9 @@ void Tuya::schedule_empty_command_(TuyaCommandType command) {
 
 void Tuya::dump_config() {
   ESP_LOGCONFIG(TAG, "Tuya:");
+  ESP_LOGCONFIG(TAG, "serial_byte_delay_us: %d", this->serial_byte_delay_us_);
+  ESP_LOGCONFIG(TAG, "serial_command_delay_us: %d", this->serial_command_delay_us_);
+
   if (this->init_state_ != TuyaInitState::INIT_DONE) {
     ESP_LOGCONFIG(TAG, "  Configuration will be reported when setup is complete. Current init_state: %u",
                   static_cast<uint8_t>(this->init_state_));
@@ -325,7 +328,7 @@ void Tuya::send_command_(TuyaCommandType command, const uint8_t *buffer, uint16_
            hexencode(buffer, len).c_str(), this->init_state_);
 
   // Write the command
-  for (auto &data_byte : {0x55, 0xAA, version, (uint8_t) command, len_hi, len_lo}) {
+  for (auto &data_byte : std::vector<uint8_t>({0x55, 0xAA, version, (uint8_t) command, len_hi, len_lo})) {
       this->write_byte(data_byte);
       delayMicroseconds(this->serial_byte_delay_us_);
   }
@@ -339,7 +342,7 @@ void Tuya::send_command_(TuyaCommandType command, const uint8_t *buffer, uint16_
     checksum += buffer[i];
   this->write_byte(checksum);
   delayMicroseconds(this->serial_byte_delay_us_);
-  delayMicroseconds(this->serial_command_delay_ms_*1000);
+  delayMicroseconds(this->serial_command_delay_us_);
 }
 
 void Tuya::set_datapoint_value(TuyaDatapoint datapoint) {
